@@ -1,22 +1,31 @@
 package com.example.fishe.project_cs3218
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private val RECORD_AUDIO_REQUEST_CODE = 101
 
-    lateinit private var soundSampler: SoundSampler
+    lateinit private var soundTransmitter: SoundTransmitter
 
     companion object {
         lateinit var buffer: ShortArray
+        var soundFFTMag: DoubleArray  = DoubleArray(1024)
 
-        var bufferSize: Int = 0     // in bytes
+        var FFT_Len = 512
+        var bufferSize: Int = 0     // in bytes, will be altered in SoundSampler.kt
+
+        val FS = 44100     // sampling frequency
+        var mx = -99999.0
+        var freqResolution: Double = FS * 1.0 / FFT_Len
     }
 
 
@@ -27,23 +36,35 @@ class MainActivity : AppCompatActivity() {
 
         // seek permission to do audio recording
         setupPermissions()
+        initiateSoundTransmitting()
 
+        sendButton?.setOnClickListener {
+            val x: String? = textMessage?.text.toString()
+            val charset = Charsets.UTF_8
+
+            if (x.isNullOrBlank()) {
+                textMessage?.error = "Empty Message"
+                textMessage?.requestFocus()
+                return@setOnClickListener
+            }
+            textMessage!!.text.clear()
+
+            val byteArray = x?.toByteArray(charset)
+            Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
+                    .show()
+            textView.text = byteArray?.toString(charset)
+            transmitMessage(byteArray)
+        }
+
+        val button1 = findViewById<Button>(R.id.soundReceive)
+        button1.setOnClickListener {
+            val intent = Intent(this, SoundReceiver::class.java).apply {
+            }
+            startActivity(intent)
+        }
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        initiateSoundSampling()
-    }
-
-
-    override fun onPause() {
-
-        soundSampler.audioRecord!!.stop()
-        soundSampler.audioRecord!!.release()
-
-        super.onPause()
-    }
 
     private fun setupPermissions() {
         val permission = checkSelfPermission(Manifest.permission.RECORD_AUDIO)
@@ -70,32 +91,25 @@ class MainActivity : AppCompatActivity() {
                     Log.i("tag", "Permission has been denied by user")
                 } else {
                     Log.i("tag", "Permission has been granted by user")
-
-
                 }
             }
         }
     }
 
-
-    fun initiateSoundSampling(){
+    private fun initiateSoundTransmitting() {
         try {
-            soundSampler = SoundSampler(this)
-
+            soundTransmitter = SoundTransmitter(this)
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot instantiate SoundSampler", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Cannot instantiate SoundTransmitter", Toast.LENGTH_LONG).show()
         }
+    }
 
-        try {
-            soundSampler.init()
-        } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot initialize SoundSampler.", Toast.LENGTH_LONG).show()
-        }
-
-
-        Toast.makeText(this, "bufferSize = " +bufferSize, Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, "buffer.size = " +buffer.size, Toast.LENGTH_SHORT).show()
-
+    private fun transmitMessage(byteArray: ByteArray?) {
+        var size:Int = byteArray!!.size
+        soundTransmitter.playSound(freqResolution * 180, 0.5)
+        for(i in 0..size-1)
+            soundTransmitter.playSound(freqResolution * (10 + byteArray?.get(i)!!.toInt()), 0.1)
+        soundTransmitter.playSound(freqResolution * 200, 0.1)
     }
 
 }

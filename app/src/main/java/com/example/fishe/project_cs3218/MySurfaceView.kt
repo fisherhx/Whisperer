@@ -5,12 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Half.toFloat
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.example.fishe.project_cs3218.MainActivity.Companion.FFT_Len
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
 import com.example.fishe.project_cs3218.MainActivity.Companion.bufferSize
 import com.example.fishe.project_cs3218.MainActivity.Companion.buffer
+import com.example.fishe.project_cs3218.MainActivity.Companion.mx
+import com.example.fishe.project_cs3218.MainActivity.Companion.soundFFTMag
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -25,23 +29,9 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     private var line_width : Float = 6f
 
-    private var soundBackgroundImage: Bitmap? = null
-    private var soundBuffer: ShortArray? = null
-    private var soundSegmented: IntArray = intArrayOf(1024)   // dummy initialization
-
-
-    private var soundFFT: DoubleArray = DoubleArray(1024)
-
-    private var soundFFTMag: DoubleArray  = DoubleArray(1024)
-    private var soundFFTTemp: DoubleArray = DoubleArray(1024)
-
-    var FFT_Len = 512
-
     private var soundLinePaint: Paint? = null
     private var soundLinePaint2: Paint? = null
     private var soundLinePaint3: Paint? = null
-
-    private var mxIntensity: Double = 0.toDouble()
 
 
     constructor(context: Context) : super(context) {
@@ -90,15 +80,6 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
         soundLinePaint3!!.setARGB(255, 0, 255, 255)
         soundLinePaint3!!.strokeWidth = 3f
 
-        soundBuffer = ShortArray(1024)
-
-        soundBackgroundImage = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-
-        soundSegmented = IntArray(FFT_Len)
-        soundFFT = DoubleArray(FFT_Len * 2)
-        soundFFTMag = DoubleArray(FFT_Len)
-        soundFFTTemp = DoubleArray(FFT_Len * 2)
-
         drawFlag = true
 
     }
@@ -125,7 +106,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
             //-----------  plot the sound wave
 
             val yOffset = 200.0f
-            val yScale = 0.1f
+            val yScale = 0.02f
 
             var prevX = 0.0f
             var prevY: Float = buffer[0].toFloat() * yScale
@@ -142,40 +123,10 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
 
             }
 
-            //----------- perform FFT
-
-            for (i in 0..FFT_Len - 1) {
-                soundFFT[i * 2] = buffer[i].toDouble()
-                soundFFT[i * 2 + 1] = 0.0
-            }
-
-            val fft = DoubleFFT_1D(FFT_Len)
-            fft.complexForward(soundFFT)
-
-            // perform fftshift here
-            for (i in 0 until FFT_Len) {
-                soundFFTTemp[i] = soundFFT[i + FFT_Len]
-                soundFFTTemp[i + FFT_Len] = soundFFT[i]
-            }
-            for (i in 0 until FFT_Len * 2) {
-                soundFFT[i] = soundFFTTemp[i]
-            }
-
-            var mx = -99999.0
-            for (i in 0 until FFT_Len) {
-                val re = soundFFT[2 * i]
-                val im = soundFFT[2 * i + 1]
-                soundFFTMag[i] = Math.log(re * re + im * im + 0.001)
-                if (soundFFTMag[i] > mx) mx = soundFFTMag[i]
-            }
-
             // normalize
             for (i in 0 until FFT_Len) {
                 soundFFTMag[i] = height * 4 / 5 - soundFFTMag[i] / mx * 500
             }
-
-            mxIntensity = mx
-
 
             // display the fft results
             val xStepSz = 1
@@ -194,14 +145,11 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
 
             }
 
-
             holder.unlockCanvasAndPost(c)
-
         }
     }
 
-
-    fun  start() {
+    private fun start() {
 
         executor.scheduleAtFixedRate( {
             draw()
@@ -210,7 +158,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
 
-    fun rand(from: Int, to: Int) : Int {
+    private fun rand(from: Int, to: Int) : Int {
         return Random().nextInt(to-from) + from
     }
 
