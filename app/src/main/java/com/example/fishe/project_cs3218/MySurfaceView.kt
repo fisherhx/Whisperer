@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Half.toFloat
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -133,7 +134,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
             c.drawLine((FFT_Len / 2).toFloat(), height.toFloat(), (FFT_Len / 2).toFloat(), 0f, soundLinePaint3)
             var i = 0
             while (i < FFT_Len - 1) {
-                c.drawLine((i / xStepSz).toFloat(), soundFFTMag[i].toFloat(), (i / xStepSz + 1).toFloat(), soundFFTMag[i + 1].toFloat(), soundLinePaint)
+                c.drawLine((i / xStepSz).toFloat(), soundFFTMag[i].toInt().toFloat(), (i / xStepSz + 1).toFloat(), soundFFTMag[i + 1].toInt().toFloat(), soundLinePaint)
 
                 if ((i - 12) % 50 == 0) {
                     p.color = Color.BLACK

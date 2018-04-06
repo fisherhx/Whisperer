@@ -23,8 +23,9 @@ class MainActivity : AppCompatActivity() {
         var FFT_Len = 512
         var bufferSize: Int = 0     // in bytes, will be altered in SoundSampler.kt
 
-        val FS = 16000     // sampling frequency
+        val FS = 44100     // sampling frequency
         var mx = -99999.0
+        var freqResolution: Double = FS * 1.0 / FFT_Len
     }
 
 
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         // seek permission to do audio recording
         setupPermissions()
+        initiateSoundTransmitting()
 
         sendButton?.setOnClickListener {
             val x: String? = textMessage?.text.toString()
@@ -50,16 +52,15 @@ class MainActivity : AppCompatActivity() {
             val byteArray = x?.toByteArray(charset)
             Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
                     .show()
-            //soundTransmitter.playSound(1000.0,1)
             textView.text = byteArray?.toString(charset)
+            transmitMessage(byteArray)
         }
     }
 
     override fun onStart() {
         super.onStart()
         initiateSoundSampling()
-        initiateFFT()
-        initiateSoundTransmitting()
+        //initiateFFT()
     }
 
 
@@ -137,7 +138,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "Cannot run FFT.", Toast.LENGTH_LONG).show()
         }
     }
-
-
+    private fun transmitMessage(byteArray: ByteArray?) {
+        var size:Int = byteArray!!.size
+        soundTransmitter.playSound(freqResolution * 180, 0.5)
+        for(i in 0..size-1)
+            soundTransmitter.playSound(freqResolution * (10 + byteArray?.get(i)!!.toInt()), 0.1)
+        soundTransmitter.playSound(freqResolution * 200, 0.1)
+    }
 
 }
