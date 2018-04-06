@@ -2,11 +2,11 @@ package com.example.fishe.project_cs3218
 
 import android.media.AudioRecord
 import android.util.Log
+import com.example.fishe.project_cs3218.MainActivity.Companion.FS
 import com.example.fishe.project_cs3218.MainActivity.Companion.bufferSize
 import com.example.fishe.project_cs3218.MainActivity.Companion.buffer
 
 class SoundSampler(activity: MainActivity) {
-    private val FS = 16000     // sampling frequency
     var audioRecord: AudioRecord? = null
     private val audioEncoding = 2
     private val nChannels = 16
@@ -41,10 +41,7 @@ class SoundSampler(activity: MainActivity) {
         recordingThread = object : Thread() {
             override fun run() {
                 while (true) {
-
                     audioRecord!!.read(buffer, 0, bufferSize)
-
-
                 }
             }
         }

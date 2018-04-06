@@ -6,17 +6,25 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private val RECORD_AUDIO_REQUEST_CODE = 101
 
     lateinit private var soundSampler: SoundSampler
+    lateinit private var soundTransmitter: SoundTransmitter
+    lateinit private var soundFFT: FFT
 
     companion object {
         lateinit var buffer: ShortArray
+        var soundFFTMag: DoubleArray  = DoubleArray(1024)
 
-        var bufferSize: Int = 0     // in bytes
+        var FFT_Len = 512
+        var bufferSize: Int = 0     // in bytes, will be altered in SoundSampler.kt
+
+        val FS = 16000     // sampling frequency
+        var mx = -99999.0
     }
 
 
@@ -28,12 +36,30 @@ class MainActivity : AppCompatActivity() {
         // seek permission to do audio recording
         setupPermissions()
 
+        sendButton?.setOnClickListener {
+            val x: String? = textMessage?.text.toString()
+            val charset = Charsets.UTF_8
 
+            if (x.isNullOrBlank()) {
+                textMessage?.error = "Empty Message"
+                textMessage?.requestFocus()
+                return@setOnClickListener
+            }
+            textMessage!!.text.clear()
+
+            val byteArray = x?.toByteArray(charset)
+            Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
+                    .show()
+            //soundTransmitter.playSound(1000.0,1)
+            textView.text = byteArray?.toString(charset)
+        }
     }
 
     override fun onStart() {
         super.onStart()
         initiateSoundSampling()
+        initiateFFT()
+        initiateSoundTransmitting()
     }
 
 
@@ -70,15 +96,13 @@ class MainActivity : AppCompatActivity() {
                     Log.i("tag", "Permission has been denied by user")
                 } else {
                     Log.i("tag", "Permission has been granted by user")
-
-
                 }
             }
         }
     }
 
 
-    fun initiateSoundSampling(){
+    private fun initiateSoundSampling(){
         try {
             soundSampler = SoundSampler(this)
 
@@ -91,11 +115,29 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(applicationContext, "Cannot initialize SoundSampler.", Toast.LENGTH_LONG).show()
         }
-
-
-        Toast.makeText(this, "bufferSize = " +bufferSize, Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, "buffer.size = " +buffer.size, Toast.LENGTH_SHORT).show()
-
     }
+
+    private fun initiateSoundTransmitting() {
+        try {
+            soundTransmitter = SoundTransmitter(this)
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, "Cannot instantiate SoundTransmitter", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun initiateFFT() {
+        try {
+            soundFFT = FFT(this)
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, "Cannot instantiate SoundFFT", Toast.LENGTH_LONG).show()
+        }
+        try {
+            soundFFT.runFFT()
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, "Cannot run FFT.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
 
 }
