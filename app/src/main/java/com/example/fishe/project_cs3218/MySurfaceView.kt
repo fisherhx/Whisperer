@@ -134,7 +134,7 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
             c.drawLine((FFT_Len / 2).toFloat(), height.toFloat(), (FFT_Len / 2).toFloat(), 0f, soundLinePaint3)
             var i = 0
             while (i < FFT_Len - 1) {
-                c.drawLine((i / xStepSz).toFloat(), soundFFTMag[i].toInt().toFloat(), (i / xStepSz + 1).toFloat(), soundFFTMag[i + 1].toInt().toFloat(), soundLinePaint)
+              //  c.drawLine((i / xStepSz).toFloat(), soundFFTMag[i].toInt().toFloat(), (i / xStepSz + 1).toFloat(), soundFFTMag[i + 1].toInt().toFloat(), soundLinePaint)
 
                 if ((i - 12) % 50 == 0) {
                     p.color = Color.BLACK

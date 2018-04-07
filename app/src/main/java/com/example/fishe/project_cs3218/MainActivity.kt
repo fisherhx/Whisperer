@@ -12,20 +12,22 @@ class MainActivity : AppCompatActivity() {
 
     private val RECORD_AUDIO_REQUEST_CODE = 101
 
-    lateinit private var soundSampler: SoundSampler
+    lateinit private var soundSampler: SoundReceiver
     lateinit private var soundTransmitter: SoundTransmitter
-    lateinit private var soundFFT: FFT
 
     companion object {
         lateinit var buffer: ShortArray
-        var soundFFTMag: DoubleArray  = DoubleArray(1024)
+        lateinit var soundFFTMag: DoubleArray
 
-        var FFT_Len = 512
-        var bufferSize: Int = 0     // in bytes, will be altered in SoundSampler.kt
+        var FFT_Len = 1024
+        var bufferSize: Int = 0     // in bytes, will be altered in SoundReceiver.ktt
 
         val FS = 44100     // sampling frequency
         var mx = -99999.0
         var freqResolution: Double = FS * 1.0 / FFT_Len
+
+        var threshold = 9999.9
+        var message: String = "hi"
     }
 
 
@@ -52,8 +54,9 @@ class MainActivity : AppCompatActivity() {
             val byteArray = x?.toByteArray(charset)
             Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
                     .show()
-            textView.text = byteArray?.toString(charset)
-            transmitMessage(byteArray)
+            //textView.text = byteArray?.toString(charset)
+            textView.text = message
+            soundTransmitter.playSound(byteArray)
         }
     }
 
@@ -86,7 +89,6 @@ class MainActivity : AppCompatActivity() {
                 RECORD_AUDIO_REQUEST_CODE)
     }
 
-
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
@@ -105,16 +107,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun initiateSoundSampling(){
         try {
-            soundSampler = SoundSampler(this)
+            soundSampler = SoundReceiver(this)
 
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot instantiate SoundSampler", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Cannot instantiate SoundReceiver", Toast.LENGTH_LONG).show()
         }
 
         try {
             soundSampler.init()
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot initialize SoundSampler.", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Cannot initialize SoundReceiver.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -125,25 +127,4 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "Cannot instantiate SoundTransmitter", Toast.LENGTH_LONG).show()
         }
     }
-
-    private fun initiateFFT() {
-        try {
-            soundFFT = FFT(this)
-        } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot instantiate SoundFFT", Toast.LENGTH_LONG).show()
-        }
-        try {
-            soundFFT.runFFT()
-        } catch (e: Exception) {
-            Toast.makeText(applicationContext, "Cannot run FFT.", Toast.LENGTH_LONG).show()
-        }
-    }
-    private fun transmitMessage(byteArray: ByteArray?) {
-        var size:Int = byteArray!!.size
-        soundTransmitter.playSound(freqResolution * 180, 0.5)
-        for(i in 0..size-1)
-            soundTransmitter.playSound(freqResolution * (10 + byteArray?.get(i)!!.toInt()), 0.1)
-        soundTransmitter.playSound(freqResolution * 200, 0.1)
-    }
-
 }
