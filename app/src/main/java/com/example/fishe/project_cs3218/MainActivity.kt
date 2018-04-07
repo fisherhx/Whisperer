@@ -22,9 +22,14 @@ class MainActivity : AppCompatActivity() {
         var FFT_Len = 1024
         var bufferSize: Int = 0     // in bytes, will be altered in SoundReceiver.ktt
 
-        val FS = 44100     // sampling frequency
+        const val FS = 44100     // sampling frequency
         var mx = -99999.0
         var freqResolution: Double = FS * 1.0 / FFT_Len
+
+        const val offset = 21 //lower frequency is not used for coded because noises usually are in low frequencies
+        const val bytePerSoundSignal = 16
+        const val freqResolutionPerByte = 25
+
 
         var threshold = 9999.9
         var message: String = "hi"

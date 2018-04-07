@@ -9,8 +9,11 @@ import com.example.fishe.project_cs3218.MainActivity.Companion.FFT_Len
 import com.example.fishe.project_cs3218.MainActivity.Companion.FS
 import com.example.fishe.project_cs3218.MainActivity.Companion.bufferSize
 import com.example.fishe.project_cs3218.MainActivity.Companion.buffer
+import com.example.fishe.project_cs3218.MainActivity.Companion.bytePerSoundSignal
+import com.example.fishe.project_cs3218.MainActivity.Companion.freqResolutionPerByte
 import com.example.fishe.project_cs3218.MainActivity.Companion.message
 import com.example.fishe.project_cs3218.MainActivity.Companion.mx
+import com.example.fishe.project_cs3218.MainActivity.Companion.offset
 import com.example.fishe.project_cs3218.MainActivity.Companion.soundFFTMag
 import com.example.fishe.project_cs3218.MainActivity.Companion.threshold
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
@@ -22,12 +25,6 @@ class SoundReceiver(activity: MainActivity)  {
 
 
     private var recordingThread: Thread? = null
-
-    //for decoding
-    private val duration = 0.1
-    private val offset = 21 //lower frequency is not used for coded because noises usually are in low frequencies
-    private val bytePerSoundSignal = 16
-    private val freqResolutionPerByte = 25
 
     @Throws(Exception::class)
     fun init() {

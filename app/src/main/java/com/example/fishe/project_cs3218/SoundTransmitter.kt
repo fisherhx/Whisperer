@@ -4,23 +4,27 @@ import android.media.AudioFormat.*
 import android.media.AudioManager
 import android.media.AudioTrack
 import android.media.AudioTrack.MODE_STREAM
+import com.example.fishe.project_cs3218.MainActivity.Companion.bytePerSoundSignal
 import com.example.fishe.project_cs3218.MainActivity.Companion.freqResolution
+import com.example.fishe.project_cs3218.MainActivity.Companion.freqResolutionPerByte
+import com.example.fishe.project_cs3218.MainActivity.Companion.offset
 import kotlin.math.abs
 
 class SoundTransmitter(activity: MainActivity) {
-    private val duration = 0.1
-    private val offset = 21 //lower frequency is not used for coded because noises usually are in low frequencies
-    private val bytePerSoundSignal = 16
-    private val freqResolutionPerByte = 25
+    private val duration = 3.5
+
     private val mBufferSize = AudioTrack.getMinBufferSize(44100,
             CHANNEL_OUT_MONO, ENCODING_PCM_8BIT)
 
-    private val mAudioTrack = AudioTrack(AudioManager.STREAM_MUSIC, 44100,
+    private var mAudioTrack = AudioTrack(AudioManager.STREAM_MUSIC, 44100,
             CHANNEL_OUT_MONO, ENCODING_PCM_16BIT,
             mBufferSize, MODE_STREAM)
 
     fun playSound(byteArray: ByteArray?) {
         // AudioTrack definition
+        mAudioTrack = AudioTrack(AudioManager.STREAM_MUSIC, 44100,
+                CHANNEL_OUT_MONO, ENCODING_PCM_16BIT,
+                mBufferSize, MODE_STREAM)
 
         val lengthOfMessage = byteArray!!.size
         var frequencyArray = DoubleArray(lengthOfMessage*4) //each byte occupies 4 frequencies
@@ -28,7 +32,7 @@ class SoundTransmitter(activity: MainActivity) {
         val mSound = DoubleArray((duration*44100).toInt())
         val mBuffer = ShortArray((duration*44100).toInt())
 
-        playStartSignal()
+        //playStartSignal()
 
         //populate frequencyArray. each byte takes up 4 frequencies
         for (i in 0 until lengthOfMessage-1) {
@@ -52,10 +56,11 @@ class SoundTransmitter(activity: MainActivity) {
 
         //play composite sine wave as sound
         for (k in 0 until lengthOfMessage/bytePerSoundSignal + Math.ceil((lengthOfMessage%bytePerSoundSignal)/10.0).toInt()) {
-            var index = 4*k //index in frequencyArray
+            var index = bytePerSoundSignal*4*k //first index in frequencyArray
             for (i in mSound.indices) {
                 for (j in 0 until 4*bytePerSoundSignal - 1)
-                    mSound[i] = Math.sin(2.0 * Math.PI * i.toDouble() / (44100 / frequencyArray[index + j]))
+                    if(j+index < frequencyArray.size)
+                        mSound[i] = mSound[i] + Math.sin(2.0 * Math.PI * i.toDouble() / (44100 / frequencyArray[index + j]))
                 mBuffer[i] = (mSound[i] * java.lang.Short.MAX_VALUE).toShort()
             }
 
@@ -69,8 +74,8 @@ class SoundTransmitter(activity: MainActivity) {
     }
 
     fun playStartSignal() {
-        val mSound = DoubleArray((duration*5*44100).toInt()) //start signal is longer
-        val mBuffer = ShortArray((duration*5*44100).toInt())
+        val mSound = DoubleArray((duration*3*44100).toInt()) //start signal is longer
+        val mBuffer = ShortArray((duration*3*44100).toInt())
         for (i in mSound.indices) {
             mSound[i] = Math.sin(2.0 * Math.PI * i.toDouble() / (44100 / (freqResolution*200)))
             mBuffer[i] = (mSound[i] * java.lang.Short.MAX_VALUE).toShort()
@@ -79,7 +84,5 @@ class SoundTransmitter(activity: MainActivity) {
         mAudioTrack.play()
 
         mAudioTrack.write(mBuffer, 0, mSound.size)
-        mAudioTrack.stop()
-        mAudioTrack.release()
     }
 }
