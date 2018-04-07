@@ -17,6 +17,7 @@ class SoundSampler(activity: SoundReceiver) {
     var audioRecord: AudioRecord? = null
     private val audioEncoding = 2
     private val nChannels = 16
+    var isRecording = false
 
 
     private var recordingThread: Thread? = null
@@ -27,6 +28,7 @@ class SoundSampler(activity: SoundReceiver) {
 
         bufferSize = AudioRecord.getMinBufferSize(FS, nChannels, audioEncoding)
         buffer = ShortArray(bufferSize)
+        isRecording = true
 
         try {
             if (audioRecord != null) {
@@ -44,7 +46,7 @@ class SoundSampler(activity: SoundReceiver) {
 
         recordingThread = object : Thread() {
             override fun run() {
-                while (true) {
+                while (isRecording) {
                     audioRecord!!.read(buffer, 0, bufferSize)
                     performFFT()
                 }
@@ -56,6 +58,14 @@ class SoundSampler(activity: SoundReceiver) {
 
     }
 
+    fun endRec(){
+        if (audioRecord != null) {
+            audioRecord!!.stop();
+            audioRecord!!.release();
+            isRecording = false
+            //recordingThread = null;
+        }
+    }
     private var soundFFT: DoubleArray = DoubleArray(1024)
 
     private var soundFFTTemp: DoubleArray = DoubleArray(1024)
@@ -80,10 +90,10 @@ class SoundSampler(activity: SoundReceiver) {
 
         val fft = DoubleFFT_1D(FFT_Len)
         var index = 0
+        var prevIndex = 0
         fft.complexForward(soundFFT)
 
         mx = -99999.0
-        msg = "SoundPG"
         for (i in 0 until FFT_Len) {
             val re = soundFFT[2 * i]
             val im = soundFFT[2 * i + 1]
@@ -94,15 +104,29 @@ class SoundSampler(activity: SoundReceiver) {
             }
 
             if(index > 25 && index < 256) {
+                if(index == prevIndex){
+                    continue
+                }
                 if(index == 180){
-                    Log.i("Starting", "Start of msg")
+                    Log.i("Max Starting", "Start of msg")
                 }
                 else if(index == 200){
-                    Log.i("Ending", "End of msg")
+                    Log.i("Max Ending", "End of msg")
                 }
                 else{
-                    msg + index.toString()
-                    Log.i("Max index", index.toString())
+                    val a = index - 10
+//                    val b = (a + '0'.toInt()).toChar()
+                    val b = (a).toChar()
+
+                    val str = (index-10).toString()
+                    val charset = Charsets.UTF_8
+                    val array = str.toByteArray()
+
+                    msg = msg + b
+                    Log.i("Max index", str)
+                    Log.i("Max char", b.toString())
+                    Log.i("Max msg", msg)
+                    prevIndex = index
                 }
             }
         }

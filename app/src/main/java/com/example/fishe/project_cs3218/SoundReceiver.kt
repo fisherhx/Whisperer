@@ -13,7 +13,7 @@ class SoundReceiver : AppCompatActivity() {
 
     companion object {
 
-        var msg: String = "testing"
+        var msg: String = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,14 +22,24 @@ class SoundReceiver : AppCompatActivity() {
     }
     override fun onStart() {
         super.onStart()
-        initiateSoundSampling()
         //initiateFFT()
-        val button1 = findViewById<Button>(R.id.receiveButton)
+        initiateSoundSampling()
+        val buttonRec = findViewById<Button>(R.id.receiveButton)
+        val buttonEnd = findViewById<Button>(R.id.endButton)
         val receiveMsg : TextView = findViewById(R.id.receiveMessage)
 
-        button1.setOnClickListener {
-            receiveMsg.text = msg
+        buttonRec.setOnClickListener {
+            initiateSoundSampling()
+            receiveMsg.text = ""
         }
+        buttonEnd.setOnClickListener {
+            var textMsg = ""
+            receiveMsg.text = msg
+            msg = ""
+            soundSampler.endRec()
+            //soundSampler.audioRecord!!.stop()
+        }
+
     }
 
 

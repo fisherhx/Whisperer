@@ -32,5 +32,12 @@
             android:layout_height="fill_parent"
             android:layout_weight="3"
             android:text="Receive" />
+        <Button
+            android:id="@+id/endButton"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="3"
+            android:text="End" />
+
     </LinearLayout>
 </LinearLayout>
