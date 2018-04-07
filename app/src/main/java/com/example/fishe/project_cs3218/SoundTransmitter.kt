@@ -66,11 +66,11 @@ class SoundTransmitter(activity: MainActivity) {
 
             mAudioTrack.setStereoVolume(AudioTrack.getMaxVolume(), AudioTrack.getMaxVolume())
             mAudioTrack.play()
-
-            mAudioTrack.write(mBuffer, 0, mSound.size)
-            mAudioTrack.stop()
-            mAudioTrack.release()
         }
+
+        mAudioTrack.write(mBuffer, 0, mSound.size)
+        mAudioTrack.stop()
+        mAudioTrack.release()
     }
 
     fun playStartSignal() {
