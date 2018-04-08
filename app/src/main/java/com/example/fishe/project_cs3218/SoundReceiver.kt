@@ -1,6 +1,5 @@
 package com.example.fishe.project_cs3218
 
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -14,6 +13,8 @@ class SoundReceiver : AppCompatActivity() {
     companion object {
 
         var msg: String = ""
+        var prevIndex: Int = 0
+        var prevLetter: String = ""
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

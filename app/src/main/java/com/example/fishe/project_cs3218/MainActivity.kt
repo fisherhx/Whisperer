@@ -106,10 +106,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun transmitMessage(byteArray: ByteArray?) {
         var size:Int = byteArray!!.size
-        soundTransmitter.playSound(freqResolution * 180, 0.5)
+        //soundTransmitter.playSound(freqResolution * 280, 0.5)
         for(i in 0..size-1)
-            soundTransmitter.playSound(freqResolution * (10 + byteArray?.get(i)!!.toInt()), 0.1)
-        soundTransmitter.playSound(freqResolution * 200, 0.1)
+            soundTransmitter.playSound(freqResolution * (100 + byteArray?.get(i)!!.toInt()), 0.2)
+        //soundTransmitter.playSound(freqResolution * 300, 0.2)
     }
 
 }

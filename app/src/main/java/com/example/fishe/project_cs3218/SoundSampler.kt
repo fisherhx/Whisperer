@@ -10,6 +10,8 @@ import com.example.fishe.project_cs3218.MainActivity.Companion.buffer
 import com.example.fishe.project_cs3218.MainActivity.Companion.soundFFTMag
 import com.example.fishe.project_cs3218.MainActivity.Companion.mx
 import com.example.fishe.project_cs3218.SoundReceiver.Companion.msg
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.prevIndex
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.prevLetter
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
 
@@ -90,7 +92,8 @@ class SoundSampler(activity: SoundReceiver) {
 
         val fft = DoubleFFT_1D(FFT_Len)
         var index = 0
-        var prevIndex = 0
+        //var prevIndex = 0
+        //var prevLetter = ""
         fft.complexForward(soundFFT)
 
         mx = -99999.0
@@ -102,34 +105,40 @@ class SoundSampler(activity: SoundReceiver) {
                 mx = soundFFTMag[i]
                 index = i
             }
-
-            if(index > 25 && index < 256) {
-                if(index == prevIndex){
-                    continue
-                }
-                if(index == 180){
-                    Log.i("Max Starting", "Start of msg")
-                }
-                else if(index == 200){
-                    Log.i("Max Ending", "End of msg")
+        }
+        if(index > 125 && index < 356) {
+            if(index == prevIndex){
+                Log.i("Max Repeated Index", "Repeated")
+            }
+            else if(index == 280){
+                Log.i("Max Starting", "Start of msg")
+            }
+            else if(index == 300){
+                Log.i("Max Ending", "End of msg")
+            }
+            else{
+                val a = index - 100
+                //val b = (a + '0'.toInt()).toChar()
+                val b = (a).toChar()
+                if(b .equals(prevLetter) ){
+                    Log.i("Max Repeated letter", "Repeated")
                 }
                 else{
-                    val a = index - 10
-//                    val b = (a + '0'.toInt()).toChar()
-                    val b = (a).toChar()
-
-                    val str = (index-10).toString()
+                    val str = (index-100).toString()
                     val charset = Charsets.UTF_8
                     val array = str.toByteArray()
 
                     msg = msg + b
                     Log.i("Max index", str)
                     Log.i("Max char", b.toString())
-                    Log.i("Max msg", msg)
+                    //Log.i("Max msg", msg)
                     prevIndex = index
+                    prevLetter = b.toString()
                 }
+
             }
         }
+
         mxIntensity = mx
     }
 
