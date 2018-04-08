@@ -11,7 +11,10 @@ import com.example.fishe.project_cs3218.MainActivity.Companion.soundFFTMag
 import com.example.fishe.project_cs3218.MainActivity.Companion.mx
 import com.example.fishe.project_cs3218.SoundReceiver.Companion.msg
 import com.example.fishe.project_cs3218.SoundReceiver.Companion.prevIndex
-import com.example.fishe.project_cs3218.SoundReceiver.Companion.prevLetter
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.currCount
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.isRepeated
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.isCounted
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.count
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
 
@@ -20,7 +23,6 @@ class SoundSampler(activity: SoundReceiver) {
     private val audioEncoding = 2
     private val nChannels = 16
     var isRecording = false
-
 
     private var recordingThread: Thread? = null
 
@@ -92,8 +94,6 @@ class SoundSampler(activity: SoundReceiver) {
 
         val fft = DoubleFFT_1D(FFT_Len)
         var index = 0
-        //var prevIndex = 0
-        //var prevLetter = ""
         fft.complexForward(soundFFT)
 
         mx = -99999.0
@@ -106,7 +106,8 @@ class SoundSampler(activity: SoundReceiver) {
                 index = i
             }
         }
-        if(index > 125 && index < 356) {
+
+        if(index > 131 && index < 223) {
             if(index == prevIndex){
                 Log.i("Max Repeated Index", "Repeated")
             }
@@ -118,24 +119,55 @@ class SoundSampler(activity: SoundReceiver) {
             }
             else{
                 val a = index - 100
-                //val b = (a + '0'.toInt()).toChar()
                 val b = (a).toChar()
-                if(b .equals(prevLetter) ){
-                    Log.i("Max Repeated letter", "Repeated")
+                if(b.equals('.')){
+                    isCounted = true
+                    prevIndex = index
                 }
-                else{
-                    val str = (index-100).toString()
+
+                if(isRepeated && !isCounted && !b.equals('/')){
+                    currCount = currCount + b
+                    count = currCount.toInt()
+
+                    //count = b.toInt()
+                    Log.i("Count char", b.toString())
+                    Log.i("Count index", count.toString())
+                    prevIndex = index
+
+                }
+
+                if(b.equals('/')){
+                    isRepeated = true
+                    Log.i("Repeating allowed", b.toString())
+                    prevIndex = index
+                }
+
+                if(isRepeated && isCounted && !b.equals('.')){
+                    isRepeated = false
+                    isCounted = false
+                    Log.i("Count Check", count.toString())
+                    //Log.i("Count char", b.toString())
+                    for (i in 0 .. count-1){
+                        msg = msg + b
+                    }
+
+                    count = 0
+                    currCount = ""
+                    prevIndex = index
+                }
+
+                else if(!isRepeated && !isCounted){
+                    val str = (index - 100).toString()
                     val charset = Charsets.UTF_8
                     val array = str.toByteArray()
-
                     msg = msg + b
                     Log.i("Max index", str)
                     Log.i("Max char", b.toString())
                     //Log.i("Max msg", msg)
                     prevIndex = index
-                    prevLetter = b.toString()
+                    count = 0
+                    //prevLetter = b.toString()
                 }
-
             }
         }
 

@@ -41,7 +41,12 @@ class MainActivity : AppCompatActivity() {
         sendButton?.setOnClickListener {
             val x: String? = textMessage?.text.toString()
             val charset = Charsets.UTF_8
-
+            var size:Int = x!!.length
+            var tempString = ""
+            var currLetter = ""
+            var prevLetter = ""
+            var isRepeated:Boolean = false
+            var count = 0
             if (x.isNullOrBlank()) {
                 textMessage?.error = "Empty Message"
                 textMessage?.requestFocus()
@@ -49,7 +54,41 @@ class MainActivity : AppCompatActivity() {
             }
             textMessage!!.text.clear()
 
-            val byteArray = x?.toByteArray(charset)
+
+//            for(letter in x){
+            for(index in x.indices){
+                currLetter = x[index].toString()     //letter.toString()
+
+                if(currLetter.equals(prevLetter)){
+                    count++
+                    isRepeated = true
+                    if(index == x.length-1){ // if last char in string
+                        var countString = (count).toString()
+                        tempString = tempString + '/' + countString + '.' + prevLetter
+                    }
+                }
+                else{
+                    if(!isRepeated){
+                        tempString = tempString + currLetter
+                        prevLetter = currLetter
+                    }
+                    else{
+                        var countString = count.toString()
+                        tempString = tempString + '/' + countString + '.' + prevLetter + currLetter
+                        prevLetter = currLetter
+                        isRepeated = false
+                        count = 0
+                    }
+                }
+            }
+
+            textView2.text = x
+
+
+            //for(i in 1 .. size-1){}
+            //val byteArray = x?.toByteArray(charset)
+            val byteArray = tempString?.toByteArray(charset)
+
             Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
                     .show()
             textView.text = byteArray?.toString(charset)

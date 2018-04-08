@@ -15,6 +15,11 @@ class SoundReceiver : AppCompatActivity() {
         var msg: String = ""
         var prevIndex: Int = 0
         var prevLetter: String = ""
+        var isRepeated: Boolean = false
+        var isCounted: Boolean = false
+        var count: Int = 0
+        var currCount : String = ""
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
