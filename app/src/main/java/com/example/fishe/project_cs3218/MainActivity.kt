@@ -9,6 +9,9 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.isEnd
+import com.example.fishe.project_cs3218.SoundReceiver.Companion.isStarted
+import java.lang.Double.parseDouble
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,9 +29,11 @@ class MainActivity : AppCompatActivity() {
         val FS = 44100     // sampling frequency
         var mx = -99999.0
         var freqResolution: Double = FS * 1.0 / FFT_Len
+        val offset = 10
+        val startPw = 195
+        val endPw = 200
+
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,39 +44,41 @@ class MainActivity : AppCompatActivity() {
         initiateSoundTransmitting()
 
         sendButton?.setOnClickListener {
-            val x: String? = textMessage?.text.toString()
+            val msgToSend: String? = textMessage?.text.toString()
             val charset = Charsets.UTF_8
-            var size:Int = x!!.length
+            var sizeMsg:Int = msgToSend!!.length
             var tempString = ""
             var currLetter = ""
             var prevLetter = ""
-            var isRepeated:Boolean = false
+            var isRepeated = false
             var count = 0
-            if (x.isNullOrBlank()) {
+            if (msgToSend.isNullOrBlank()) {
                 textMessage?.error = "Empty Message"
                 textMessage?.requestFocus()
                 return@setOnClickListener
             }
             textMessage!!.text.clear()
 
-
-//            for(letter in x){
-            for(index in x.indices){
-                currLetter = x[index].toString()     //letter.toString()
-
+            for(index in msgToSend.indices){
+                currLetter = msgToSend[index].toString()
+                //If the letter is repeated, start counting number of time it is repeated
                 if(currLetter.equals(prevLetter)){
                     count++
                     isRepeated = true
-                    if(index == x.length-1){ // if last char in string
+                    // If the curr letter is the last char in the string, append it along with the count
+                    if(index == sizeMsg-1){
                         var countString = (count).toString()
                         tempString = tempString + '/' + countString + '.' + prevLetter
                     }
                 }
+                //If the letter is not repeated, append the letter to the msg depending
                 else{
+                    //Non repeated, simply append
                     if(!isRepeated){
                         tempString = tempString + currLetter
                         prevLetter = currLetter
                     }
+                    //Repeated Char, append with special char to indicate start and end of repeating
                     else{
                         var countString = count.toString()
                         tempString = tempString + '/' + countString + '.' + prevLetter + currLetter
@@ -82,16 +89,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            textView2.text = x
+            originalText.text = msgToSend
 
-
-            //for(i in 1 .. size-1){}
-            //val byteArray = x?.toByteArray(charset)
             val byteArray = tempString?.toByteArray(charset)
 
             Toast.makeText(this, byteArray?.contentToString() , Toast.LENGTH_LONG)
                     .show()
-            textView.text = byteArray?.toString(charset)
+            transformedText.text = byteArray?.toString(charset)
             transmitMessage(byteArray)
         }
 
@@ -102,8 +106,40 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-    }
+        /*sendPw?.setOnClickListener {
+            val setPw: String? = textPw?.text.toString()
+            var numeric = false
+            if (setPw.isNullOrBlank()) {
+                textPw?.error = "Enter Pw"
+                textPw?.requestFocus()
+                return@setOnClickListener
+            }
+            textPw!!.text.clear()
+            try {
+                val num = parseDouble(setPw)
+                numeric = true
+            } catch (e: NumberFormatException) {
+                numeric = false
+            }
+            /*if (setPw != null) {
+                numeric = setPw.matches("-?\\d+(\\.\\d+)?".toRegex())
+            }*/
 
+            if (numeric){
+                showPw.text = setPw
+                if (setPw != null) {
+                    startPw = setPw.toInt()
+                }
+                Toast.makeText(this, startPw.toString(), Toast.LENGTH_LONG)
+                    .show()
+            }else{
+                showPw.text = "Invalid Passcode, please enter an Integer"
+            }
+
+
+        }*/
+
+    }
 
     private fun setupPermissions() {
         val permission = checkSelfPermission(Manifest.permission.RECORD_AUDIO)
@@ -126,7 +162,6 @@ class MainActivity : AppCompatActivity() {
             RECORD_AUDIO_REQUEST_CODE -> {
 
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-
                     Log.i("tag", "Permission has been denied by user")
                 } else {
                     Log.i("tag", "Permission has been granted by user")
@@ -145,10 +180,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun transmitMessage(byteArray: ByteArray?) {
         var size:Int = byteArray!!.size
-        //soundTransmitter.playSound(freqResolution * 280, 0.5)
+        soundTransmitter.playSound(freqResolution * startPw, 0.2)
         for(i in 0..size-1)
-            soundTransmitter.playSound(freqResolution * (100 + byteArray?.get(i)!!.toInt()), 0.2)
-        //soundTransmitter.playSound(freqResolution * 300, 0.2)
+            soundTransmitter.playSound(freqResolution * (offset + 2 * (byteArray?.get(i)!!.toInt()-32)), 0.23)
+        soundTransmitter.playSound(freqResolution * endPw, 0.2)
     }
 
 }

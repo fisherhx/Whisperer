@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.example.fishe.project_cs3218.MainActivity.Companion.FFT_Len
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
 import com.example.fishe.project_cs3218.MainActivity.Companion.bufferSize
 import com.example.fishe.project_cs3218.MainActivity.Companion.buffer
 import com.example.fishe.project_cs3218.MainActivity.Companion.mx
@@ -64,7 +63,6 @@ class MySurfaceView : SurfaceView, SurfaceHolder.Callback {
 
     fun initialize() {
         holder.addCallback(this)
-
 
         soundLinePaint = Paint()
         soundLinePaint!!.setARGB(255, 0, 0, 255)

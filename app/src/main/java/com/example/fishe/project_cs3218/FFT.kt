@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.example.fishe.project_cs3218.MainActivity.Companion.FFT_Len
 import com.example.fishe.project_cs3218.MainActivity.Companion.mx
 import com.example.fishe.project_cs3218.MainActivity.Companion.soundFFTMag
-import com.example.fishe.project_cs3218.R.id.surfaceView
+//import com.example.fishe.project_cs3218.R.id.surfaceView
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D
 
 class FFT(activity: SoundReceiver) {

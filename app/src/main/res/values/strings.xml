@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">project-CS3218</string>
+    <string name="app_name">Whisperer</string>
+    <string name="soundReceive">Recieve Sound Signal</string>
+    <string name="startRec">Start Rec</string>
+    <string name="endRec">Decode Sound</string>
+    <string name="invalidPw">Invalid Passcode, please enter an Integer</string>
+
 </resources>
