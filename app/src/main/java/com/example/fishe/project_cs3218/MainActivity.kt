@@ -30,8 +30,8 @@ class MainActivity : AppCompatActivity() {
         var mx = -99999.0
         var freqResolution: Double = FS * 1.0 / FFT_Len
         val offset = 10
-        val startPw = 195
-        val endPw = 200
+        val startPw = 201
+        val endPw = 204
 
     }
 
@@ -61,6 +61,15 @@ class MainActivity : AppCompatActivity() {
 
             for(index in msgToSend.indices){
                 currLetter = msgToSend[index].toString()
+                if(currLetter.equals("A")){
+                    currLetter = "{"
+                }
+                if(currLetter.equals("B")){
+                    currLetter = "|"
+                }
+                if(currLetter.equals("C")){
+                    currLetter = "}"
+                }
                 //If the letter is repeated, start counting number of time it is repeated
                 if(currLetter.equals(prevLetter)){
                     count++
@@ -148,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         var size:Int = byteArray!!.size
         soundTransmitter.playSound(freqResolution * startPw, 0.2)
         for(i in 0..size-1)
-            soundTransmitter.playSound(freqResolution * (offset + 2 * (byteArray?.get(i)!!.toInt()-32)), 0.2)
+            soundTransmitter.playSound(freqResolution * (offset + 2 * (byteArray?.get(i)!!.toInt()-32)), 0.22)
         soundTransmitter.playSound(freqResolution * endPw, 0.2)
     }
 

@@ -118,13 +118,27 @@ class SoundSampler(activity: SoundReceiver) {
             isEnd = true
             Log.i("Max Ended", "end")
         }
-        if(index > 9 && index < 191) {
+        if(index > 9 && index < 197) {
             if(index == prevIndex){
                 Log.i("Max Repeated Index", "Repeated")
             }
             else if(isStarted && !isEnd){
-                val ascii_Value = ((index - offset)/2)+32
+                var ascii_Value = ((index - offset)/2)+32
+                val checkingAscii = ascii_Value
+
+                if(ascii_Value == 123){
+                    ascii_Value = 65
+                }
+                else if(ascii_Value == 124){
+                    ascii_Value = 66
+                }
+                else if(ascii_Value == 125){
+                    ascii_Value = 67
+                }
+
                 val ascii_Char = (ascii_Value).toChar()
+                Log.i("Max index", ascii_Char.toString())
+
                 //indicate that counting is finish
                 if(ascii_Char.equals('.')){
                     isCounted = true
@@ -132,7 +146,7 @@ class SoundSampler(activity: SoundReceiver) {
                 }
                 //Counting number of occurance by appending the character for the number to currCount and converting that value to string
                 if(isRepeated && !isCounted && !ascii_Char.equals('/')){
-                    if(ascii_Value>=48 && ascii_Value<=57){
+                    if(checkingAscii>=48 && checkingAscii<=57){
                         currCount = currCount + ascii_Char
                         count = currCount.toInt()
                         Log.i("Count char", ascii_Char.toString())
@@ -143,7 +157,17 @@ class SoundSampler(activity: SoundReceiver) {
                 //Indicate start of counting repeated char
                 if(ascii_Char.equals('/')){
                     isRepeated = true
-                    repeatedWord = (((prevIndex - offset)/2)+32).toChar()
+                    var value = ((prevIndex - offset)/2)+32
+                    if(value == 123){
+                        value = 65
+                    }
+                    else if(value == 124){
+                        value = 66
+                    }
+                    else if(value == 125){
+                        value = 67
+                    }
+                    repeatedWord = value.toChar()
                     Log.i("Repeating started", ascii_Char.toString())
                     prevIndex = index
                 }
@@ -154,7 +178,7 @@ class SoundSampler(activity: SoundReceiver) {
                     //Log.i("Count Check", count.toString())
 
                     for (i in 0 .. count-1){
-                        if(!((ascii_Value>=33&&ascii_Value<=45)||(ascii_Value>=58&&ascii_Value<=64)||(ascii_Value>=91&&ascii_Value<=96))) {
+                        if(!((checkingAscii>=33&&checkingAscii<=45)||(checkingAscii>=58&&checkingAscii<=67)||(checkingAscii>=91&&checkingAscii<=96))) {
                             msg = msg + repeatedWord
                             Log.i("Count msg repeat", msg)
                             Log.i("Count repeat", repeatedWord.toString())
@@ -168,9 +192,8 @@ class SoundSampler(activity: SoundReceiver) {
                 else if(!isRepeated && !isCounted){
                     val str = (((index - 10)/2)+32).toString()
                     if(str != (((prevIndex - 10)/2)+32).toString()){
-
-                        //exclude these non alpha numeric characters
-                        if(!((ascii_Value>=33&&ascii_Value<=45)||(ascii_Value>=58&&ascii_Value<=64)||(ascii_Value>=91&&ascii_Value<=96))) {
+                        //exclude these non alpha numeric characters 64
+                        if(!((checkingAscii>=33&&checkingAscii<=45)||(checkingAscii>=58&&checkingAscii<=67)||(checkingAscii>=91&&checkingAscii<=96))) {
                             msg = msg + ascii_Char
                             Log.i("Max char", ascii_Char.toString())
                         }

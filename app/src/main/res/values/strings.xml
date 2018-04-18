@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Whisperer</string>
+    <string name="app_name">KhooKayLengDesmond_HeeHanXiang_CS3218</string>
     <string name="soundReceive">Recieve Sound Signal</string>
     <string name="startRec">Start Rec</string>
     <string name="endRec">Decode Sound</string>
