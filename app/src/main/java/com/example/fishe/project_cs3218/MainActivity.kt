@@ -105,40 +105,6 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-
-        /*sendPw?.setOnClickListener {
-            val setPw: String? = textPw?.text.toString()
-            var numeric = false
-            if (setPw.isNullOrBlank()) {
-                textPw?.error = "Enter Pw"
-                textPw?.requestFocus()
-                return@setOnClickListener
-            }
-            textPw!!.text.clear()
-            try {
-                val num = parseDouble(setPw)
-                numeric = true
-            } catch (e: NumberFormatException) {
-                numeric = false
-            }
-            /*if (setPw != null) {
-                numeric = setPw.matches("-?\\d+(\\.\\d+)?".toRegex())
-            }*/
-
-            if (numeric){
-                showPw.text = setPw
-                if (setPw != null) {
-                    startPw = setPw.toInt()
-                }
-                Toast.makeText(this, startPw.toString(), Toast.LENGTH_LONG)
-                    .show()
-            }else{
-                showPw.text = "Invalid Passcode, please enter an Integer"
-            }
-
-
-        }*/
-
     }
 
     private fun setupPermissions() {
@@ -182,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         var size:Int = byteArray!!.size
         soundTransmitter.playSound(freqResolution * startPw, 0.2)
         for(i in 0..size-1)
-            soundTransmitter.playSound(freqResolution * (offset + 2 * (byteArray?.get(i)!!.toInt()-32)), 0.23)
+            soundTransmitter.playSound(freqResolution * (offset + 2 * (byteArray?.get(i)!!.toInt()-32)), 0.2)
         soundTransmitter.playSound(freqResolution * endPw, 0.2)
     }
 

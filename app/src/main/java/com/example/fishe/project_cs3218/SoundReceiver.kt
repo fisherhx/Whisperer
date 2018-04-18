@@ -37,7 +37,7 @@ class SoundReceiver : AppCompatActivity() {
         val buttonRec = findViewById<Button>(R.id.receiveButton)
         val buttonEnd = findViewById<Button>(R.id.endButton)
         val receiveMsg : TextView = findViewById(R.id.receiveMessage)
-        receiveMsg.text = startPw.toString()
+        //receiveMsg.text = startPw.toString()
         buttonRec.setOnClickListener {
             soundSampler.endRec()
             initiateSoundSampling()

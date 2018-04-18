@@ -122,10 +122,6 @@ class SoundSampler(activity: SoundReceiver) {
             if(index == prevIndex){
                 Log.i("Max Repeated Index", "Repeated")
             }
-            /*else if((index>132&&index<146) ||(index>157&&index<165) ||(index>190&&index<197)){
-                //Do nothing skip as not AlphaNumeric
-                prevIndex = index
-            }*/
             else if(isStarted && !isEnd){
                 val ascii_Value = ((index - offset)/2)+32
                 val ascii_Char = (ascii_Value).toChar()
@@ -155,14 +151,14 @@ class SoundSampler(activity: SoundReceiver) {
                 if(isRepeated && isCounted && !ascii_Char.equals('.')){
                     isRepeated = false
                     isCounted = false
-                    Log.i("Count Check", count.toString())
-                    //Log.i("Count char", b.toString())
-                    for (i in 0 .. count-1){
-                        msg = msg + repeatedWord
-                        Log.i("Count msg repeat", msg)
-                        Log.i("Count msg repeat char", ascii_Char.toString())
-                        Log.i("Count msg char V2", repeatedWord.toString())
+                    //Log.i("Count Check", count.toString())
 
+                    for (i in 0 .. count-1){
+                        if(!((ascii_Value>=33&&ascii_Value<=45)||(ascii_Value>=58&&ascii_Value<=64)||(ascii_Value>=91&&ascii_Value<=96))) {
+                            msg = msg + repeatedWord
+                            Log.i("Count msg repeat", msg)
+                            Log.i("Count repeat", repeatedWord.toString())
+                        }
                     }
                     count = 0
                     currCount = ""
@@ -171,9 +167,15 @@ class SoundSampler(activity: SoundReceiver) {
                 //For single letters that are non-repeated
                 else if(!isRepeated && !isCounted){
                     val str = (((index - 10)/2)+32).toString()
-                    msg = msg + ascii_Char
+                    if(str != (((prevIndex - 10)/2)+32).toString()){
+
+                        //exclude these non alpha numeric characters
+                        if(!((ascii_Value>=33&&ascii_Value<=45)||(ascii_Value>=58&&ascii_Value<=64)||(ascii_Value>=91&&ascii_Value<=96))) {
+                            msg = msg + ascii_Char
+                            Log.i("Max char", ascii_Char.toString())
+                        }
+                    }
                     Log.i("Max index", str)
-                    Log.i("Max char", ascii_Char.toString())
                     Log.i("Max prev index", (((prevIndex - 10)/2)+32).toString())
                     //Log.i("Max msg", msg)
                     prevIndex = index
