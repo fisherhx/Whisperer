@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.example.fishe.project_cs3218"
+        applicationId "com.example.fishe.KhooKayLengDesmond_HeeHanXiang_CS3218"
         minSdkVersion 23
         targetSdkVersion 27
         versionCode 1
